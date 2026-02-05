@@ -1,0 +1,11 @@
+# patient-api/.htaccess
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Redirect all API requests to index.php
+RewriteRule ^api/(.*)$ api/index.php?request=$1 [QSA,L]
+
+# Handle requests without trailing slash
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
