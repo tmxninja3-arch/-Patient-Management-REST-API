@@ -7,8 +7,7 @@
  * 2. Applies middleware
  * 3. Parses URL to determine endpoint
  * 4. Routes to correct controller method
- * 
- * Request Flow:
+ 
  *   Client → .htaccess → index.php → Middleware → Controller → Response
  */
 
@@ -56,16 +55,6 @@ $parts = explode('/', $request);
 // Get HTTP method
 $method = $_SERVER['REQUEST_METHOD'];
 
-
-/**
- * Route Table:
- * 
- * GET    /api/patients        → index()
- * GET    /api/patients/{id}   → show($id)
- * POST   /api/patients        → store()
- * PUT    /api/patients/{id}   → update($id)
- * DELETE /api/patients/{id}   → destroy($id)
- */
 
 // Check if request is for patients endpoint
 if ($parts[0] === 'patients') {

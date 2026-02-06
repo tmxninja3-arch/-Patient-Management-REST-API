@@ -6,7 +6,6 @@
  * - All database operations
  * - SQL queries
  * - Data handling
-  
  * Flow: Connect → Prepare → Bind → Execute → Return
  */
 class Patient {

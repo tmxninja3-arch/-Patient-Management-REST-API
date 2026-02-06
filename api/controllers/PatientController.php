@@ -1,13 +1,10 @@
 <?php
 
 /**
- * Responsibility:
  * - Receive HTTP requests
  * - Validate input
  * - Call Model methods
  * - Send Response
- *  
- * Flow: Read → Validate → Decide → Call Model → Respond
  */
 class PatientController {
     
