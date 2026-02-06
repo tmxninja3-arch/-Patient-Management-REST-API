@@ -20,9 +20,8 @@ class PatientController {
      */
     public function index() {
         
-        // Call model to get all patients
         $patients = $this->model->getAllPatients();
-        // Send success response
+        
         Response::success(
             "Patients retrieved successfully",
             $patients

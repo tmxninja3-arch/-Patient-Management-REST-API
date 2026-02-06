@@ -11,19 +11,11 @@
  *   Client → .htaccess → index.php → Middleware → Controller → Response
  */
 
-// Config
+
 require_once 'config/database.php';
-
-// Middleware
 require_once 'middlewares/JsonMiddleware.php';
-
-// Helpers
 require_once 'helpers/Response.php';
-
-// Models
 require_once 'models/Patient.php';
-
-// Controllers
 require_once 'controllers/PatientController.php';
 
 
@@ -45,11 +37,7 @@ if (!$db) {
 
 // Get the request URI from .htaccess rewrite
 $request = isset($_GET['request']) ? $_GET['request'] : '';
-
-// Remove trailing slash
 $request = rtrim($request, '/');
-
-// Split into parts
 $parts = explode('/', $request);
 
 // Get HTTP method
@@ -65,62 +53,60 @@ if ($parts[0] === 'patients') {
     // Get patient ID if provided
     $id = isset($parts[1]) ? (int)$parts[1] : null;
     
-    // Route based on HTTP method
     switch ($method) {
         
-        // GET Request
+      
         case 'GET':
             if ($id) {
-                // GET /api/patients/{id}
+               
                 $controller->show($id);
             } else {
-                // GET /api/patients
+                
                 $controller->index();
             }
             break;
         
-        // POST Request
         case 'POST':
             if ($id) {
                 Response::badRequest("Cannot POST to specific patient ID");
             }
-            // POST /api/patients
+            
             $controller->store();
             break;
         
-        // PUT Request
+      
         case 'PUT':
             if (!$id) {
                 Response::badRequest("Patient ID required for update");
             }
-            // PUT /api/patients/{id}
+            
             $controller->update($id);
             break;
         
-        // PATCH Request
+       
         case 'PATCH':
             if (!$id) {
                 Response::badRequest("Patient ID required for partial update");
             }
-            // PATCH /api/patients/{id}
+           
             $controller->patch($id);
             break;
         
-        // DELETE Request
+        
         case 'DELETE':
             if (!$id) {
                 Response::badRequest("Patient ID required for delete");
             }
-            // DELETE /api/patients/{id}
+            
             $controller->destroy($id);
             break;
         
-        // Unsupported Method
+
         default:
             Response::json(405, false, "Method not allowed");
     }
     
 } else {
-    // Unknown endpoint
+    
     Response::notFound("Endpoint not found. Available: /api/patients");
 }
