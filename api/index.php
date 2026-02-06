@@ -97,6 +97,15 @@ if ($parts[0] === 'patients') {
             $controller->update($id);
             break;
         
+        // PATCH Request
+        case 'PATCH':
+            if (!$id) {
+                Response::badRequest("Patient ID required for partial update");
+            }
+            // PATCH /api/patients/{id}
+            $controller->patch($id);
+            break;
+        
         // DELETE Request
         case 'DELETE':
             if (!$id) {
@@ -115,4 +124,3 @@ if ($parts[0] === 'patients') {
     // Unknown endpoint
     Response::notFound("Endpoint not found. Available: /api/patients");
 }
-?>

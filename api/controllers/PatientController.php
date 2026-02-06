@@ -107,7 +107,7 @@ class PatientController {
     
     /**
      * PUT /api/patients/{id}
-     * Update existing patient
+     * Update existing patient (full update)
      */
     public function update($id) {
         
@@ -159,10 +159,76 @@ class PatientController {
     }
     
     /**
+     * PATCH /api/patients/{id}
+     * Partially update existing patient
+     */
+    public function patch($id) {
+        
+        // Validate ID
+        if (!$id || !is_numeric($id)) {
+            Response::badRequest("Invalid patient ID");
+        }
+        
+        // Get JSON input
+        $input = json_decode(file_get_contents("php://input"), true);
+        
+        // Validate input
+        if (!$input) {
+            Response::badRequest("Invalid JSON input");
+        }
+        
+        // Validate provided fields (partial, so no required fields enforced)
+        $allowedFields = ['name', 'age', 'gender', 'phone'];
+        $errors = [];
+        foreach ($input as $field => $value) {
+            if (!in_array($field, $allowedFields)) {
+                $errors[] = "Invalid field: $field";
+            } elseif (empty(trim($value))) {
+                $errors[] = "$field cannot be empty";
+            }
+        }
+        
+        if (!empty($errors)) {
+            Response::json(400, false, "Validation failed", $errors);
+        }
+        
+        // Validate age if provided
+        if (isset($input['age']) && (!is_numeric($input['age']) || $input['age'] < 0 || $input['age'] > 150)) {
+            Response::badRequest("Invalid age value");
+        }
+        
+        // Validate gender if provided
+        if (isset($input['gender'])) {
+            $validGenders = ['Male', 'Female', 'Other'];
+            if (!in_array($input['gender'], $validGenders)) {
+                Response::badRequest("Gender must be Male, Female, or Other");
+            }
+        }
+        
+        // Call model to partially update
+        $result = $this->model->updatePatientPartial($id, $input);
+        
+        if ($result === null) {
+            Response::notFound("Patient not found");
+        }
+        
+        if (!$result) {
+            Response::serverError("Failed to update patient");
+        }
+        
+        // Get updated patient data
+        $patient = $this->model->getPatientById($id);
+        
+        // Send success response
+        Response::success(
+            "Patient updated successfully",
+            $patient
+        );
+    }
+    
+    /**
      * DELETE /api/patients/{id}
      * Delete patient
-     * 
-     * @param int $id Patient ID
      */
     public function destroy($id) {
         
@@ -188,10 +254,6 @@ class PatientController {
     
     /**
      * Validate required fields
-     * 
-     * @param array $input Input data
-     * @param array $required Required field names
-     * @return array Array of missing fields
      */
     private function validateFields($input, $required) {
         $errors = [];

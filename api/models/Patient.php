@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Responsibility:
  * - All database operations
@@ -121,6 +120,47 @@ class Patient {
             $data['phone'],
             $id
         );
+        
+        return $stmt->execute();
+    }
+    
+    public function updatePatientPartial($id, $data) {
+        
+        // First check if patient exists
+        if (!$this->getPatientById($id)) {
+            return null; 
+        }
+        
+        // Dynamically build SET clause
+        $setParts = [];
+        $types = '';
+        $values = [];
+        
+        foreach ($data as $field => $value) {
+            $setParts[] = "$field = ?";
+            if ($field === 'age') {
+                $types .= 'i';
+            } elseif ($field === 'gender') {
+                $types .= 's';
+            } else {
+                $types .= 's';
+            }
+            $values[] = $value;
+        }
+        
+        $setClause = implode(', ', $setParts);
+        $query = "UPDATE " . $this->table . " SET $setClause WHERE id = ?";
+        $types .= 'i';
+        $values[] = $id;
+        
+        $stmt = $this->conn->prepare($query);
+        
+        if (!$stmt) {
+            return false;
+        }
+        
+        // Bind parameters dynamically
+        $stmt->bind_param($types, ...$values);
         
         return $stmt->execute();
     }
